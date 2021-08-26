@@ -1,2 +1,2 @@
-# discordpybot
+# Pythonbot
 Python Bot for discord
