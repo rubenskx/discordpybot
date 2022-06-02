@@ -5,7 +5,10 @@ import json
 import random
 from replit import db
 from keep_alive import keep_alive
-
+import bs4
+import time
+from bs4 import BeautifulSoup
+from urllib.request import urlopen
 
 
 client = discord.Client()
@@ -63,6 +66,26 @@ def delete_encouragment(index):
     db["encouragements"] = encouragements
 
 
+def get_weather():
+  headers = {
+      'User-Agent':"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Mobile Safari/537.36 Edg/94.0.992.31'"
+  }
+  t = time.localtime()
+  current_hr = time.strftime("%H:%M", t)   
+  url = "https://www.bbc.com/weather/287286" #Enter the weather link of the city that needs to be checked   
+  cnt5=''
+  cnt6=''
+  cnt1 =''
+  r = requests.get(url,{'headers':headers})
+  soup = bs4.BeautifulSoup(r.text,"html.parser")
+  tag = soup.find('h1', attrs={"id": "wr-location-name-id"})
+  cnt1+=tag.text
+  tag = soup.find('span', attrs={"class": "wr-value--temperature--c"})
+  cnt5+=tag.text
+  tag = soup.find('div', attrs={"class": "wr-day__weather-type-description wr-js-day-content-weather-type-description wr-day__content__weather-type-description--opaque"})
+  cnt6+=tag.text
+  final ="Time: "+ current_hr + " .The temperature is "+ cnt5 + " now. " + cnt6
+  return(final)
 
   
 @client.event
@@ -129,7 +152,11 @@ async def on_message(message):
     else:
       db["responding"] = False
       await message.channel.send("Responding is off.")
-
+      
+  if msg.startswith("$weather"):
+    updates =get_weather()
+    await message.channel.send(updates)
+    
    
 
 
